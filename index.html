@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="theme-color" content="#0a0612">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <title>Senin Hikayen</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,300;0,400;0,700;1,400&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body data-scroll="locked">
+
+    <!-- ARKA PLAN -->
+    <canvas id="starfield" class="starfield" aria-hidden="true"></canvas>
+    <div class="aurora" aria-hidden="true">
+        <div class="aurora__blob aurora__blob--1"></div>
+        <div class="aurora__blob aurora__blob--2"></div>
+        <div class="aurora__blob aurora__blob--3"></div>
+    </div>
+    <div class="noise" aria-hidden="true"></div>
+    <div class="vignette" aria-hidden="true"></div>
+
+    <!-- İLERLEME ÇUBUĞU -->
+    <div class="progress">
+        <div class="progress__track"><div class="progress__fill" id="progressFill"></div></div>
+        <span class="progress__label" id="progressLabel">01 / 06</span>
+    </div>
+
+    <!-- MÜZİK (sarki.mp3 aynı klasörde olmalı) -->
+    <audio id="bgMusic" src="sarki.mp3" loop preload="auto"></audio>
+    <button id="musicToggle" class="audio-control" data-muted="true" aria-label="Müzik">
+        <svg class="audio-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M11 5L6 9H2v6h4l5 4V5z"/>
+            <path class="audio-wave" d="M15.54 8.46a5 5 0 0 1 0 7.07"/>
+            <path class="audio-wave" d="M19.07 4.93a10 10 0 0 1 0 14.14"/>
+        </svg>
+    </button>
+
+    <!-- ═══════════════ SAHNE 01 · AÇILIŞ + FOTOĞRAFLAR ═══════════════ -->
+    <section id="scene01" class="scene scene-active" data-scene="1">
+        <div class="scene-inner">
+            <div class="eyebrow fade-in">
+                <span class="eyebrow-dot"></span>
+                <span>Bir hikaye başlıyor</span>
+            </div>
+
+            <h1 class="hero-title">
+                <span class="hero-line">Bugün</span>
+                <span class="hero-line hero-line--accent">senin günün</span>
+            </h1>
+
+            <p class="hero-sub fade-in-delay">
+                <span class="hero-greeting" id="heroGreeting"></span>
+                Sana anlatmak istediğim bir şey var.<br>
+                Küçük bir yolculuk gibi. Hazır mısın?
+            </p>
+
+            <div class="gift-stage">
+                <button id="giftBtn" class="giant-gift" aria-label="Hediyeyi aç">🎁</button>
+            </div>
+
+            <div class="tap-hint">
+                <span class="tap-pulse"></span>
+                <span>Kutuyu aç</span>
+            </div>
+
+            <!-- Kutuya basınca çıkan bölüm -->
+            <div class="gift-reveal">
+                <h2 class="scene-title">Bunlar sana <em>veremediklerim</em></h2>
+
+                <!-- ✏️ FOTOĞRAFLAR: her fotoğrafın konumunu style="..." içindeki sayılarla ayarla (0%, 0% = alanın tam ortası)
+
+                         −y  (yukarı)
+                          │
+                −x (sol) ─┼─ +x (sağ)
+                          │
+                         +y  (aşağı)
+
+                     --x : sağa / sola      eksi = sola,   artı = sağa       örn: -25%  0%  25%
+                     --y : yukarı / aşağı   eksi = yukarı, artı = aşağı      örn: -15%  0%  15%
+                     --w : genişlik (alanın yüzdesi)                         örn: 30%  40%  55%
+                     --r : eğim açısı       eksi = sola yatar                örn: -8deg  0deg  6deg
+                     --z : katman           büyük sayı üstte durur           örn: 1  2  3
+                     --d : çıkış gecikmesi  (saniye)                         örn: .3s  .55s
+                     Fotoğraf eklemek için bir <figure> satırını kopyala, silmek için satırı sil. -->
+                <div class="gift-photos">
+                    <figure class="gift-photo" style="--x: 0%;   --y: -15%; --w: 64%; --r: -5deg; --z: 1; --d: .8s;"><img src="lale.png" alt=""></figure>
+                    <figure class="gift-photo" style="--x: 10%;  --y: +5%; --w: 52%; --r: 10deg;  --z: 2; --d: .55s;"><img src="pepsi.png" alt=""></figure>
+                    <figure class="gift-photo" style="--x: -10%;   --y: +5%; --w: 34%; --r: -10deg; --z: 2; --d: .8s;"><img src="kola.png" alt=""></figure>
+                    <figure class="gift-photo" style="--x: 0%; --y: +20%;  --w: 42%; --r: 0deg; --z: 3; --d: .3s;"><img src="kolye.png" alt=""></figure>
+                </div>
+
+                <button class="btn btn--primary" data-next="2"><span>Devam et</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 5l7 7-7 7"/></svg></button>
+            </div>
+        </div>
+    </section>
+
+    <!-- ═══════════════ SAHNE 02 · DİLEKLER ═══════════════ -->
+    <section id="scene02" class="scene" data-scene="2">
+        <div class="scene-inner scene-inner--wish">
+            <div class="chapter-tag">
+                <span>Bölüm 01</span>
+                <span class="chapter-line"></span>
+                <span>Dilekler</span>
+            </div>
+
+            <h2 class="scene-title">
+                Gökyüzüne bak.<br>
+                <em>Ne görüyorsun?</em>
+            </h2>
+
+            <p class="scene-sub">
+                Her yıldız bir dilek.<br>
+                Ve şu an gökyüzünde <span class="counter" id="wishCount">0</span> dilek parlıyor.
+            </p>
+
+            <div class="wish-cloud">
+                <div class="wish" style="--x: 15%; --y: 20%; --d: 0s;">✨</div>
+                <div class="wish" style="--x: 78%; --y: 15%; --d: 1s;">⭐</div>
+                <div class="wish" style="--x: 25%; --y: 75%; --d: 2s;">✨</div>
+                <div class="wish" style="--x: 82%; --y: 68%; --d: 0.5s;">⭐</div>
+                <div class="wish" style="--x: 50%; --y: 40%; --d: 1.5s;">✨</div>
+                <div class="wish" style="--x: 65%; --y: 85%; --d: 2.5s;">⭐</div>
+                <div class="wish" style="--x: 10%; --y: 55%; --d: 0.8s;">✨</div>
+                <div class="wish" style="--x: 90%; --y: 45%; --d: 1.8s;">⭐</div>
+            </div>
+
+            <div class="input-group">
+                <input type="text" id="wishInput" class="text-input" placeholder=" " maxlength="60" autocomplete="off">
+                <label for="wishInput" class="text-input-label">Bir dilek tut ve Enter'a bas</label>
+            </div>
+
+            <div class="wish-list-wrapper">
+                <div class="wish-list" id="wishList"></div>
+            </div>
+
+            <div class="scene-footer">
+                <button class="btn btn--primary" data-next="3"><span>Dileklerimi tuttum</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 5l7 7-7 7"/></svg></button>
+            </div>
+        </div>
+    </section>
+
+    <!-- ═══════════════ SAHNE 03 · PASTA ═══════════════ -->
+    <section id="scene03" class="scene" data-scene="3">
+        <div class="scene-inner scene-inner--cake">
+            <div class="chapter-tag">
+                <span>Bölüm 02</span>
+                <span class="chapter-line"></span>
+                <span>Yaşın</span>
+            </div>
+
+            <h2 class="scene-title scene-title--drop">
+                <span class="drop-number">22</span>
+                <span class="drop-label">yaşındasın</span>
+            </h2>
+
+            <p class="scene-sub">
+                Üç mum var. Her biri bir dilek.<br>
+                Mumlara dokunarak tek tek söndür.
+            </p>
+
+            <div class="cake-stage">
+                <div class="cake-wrapper">
+                    <div class="cake" id="cake">
+                        <div class="cake__glow" aria-hidden="true"></div>
+                        <div class="candles-layer" id="candlesLayer"></div>
+
+                        <div class="tier tier--top">
+                            <div class="tier__body"><div class="tier__pearls"></div></div>
+                            <div class="tier__icing">
+                            <span class="drip" style="--x: 8%; --h: 12px; --d: 0s;"></span>
+                            <span class="drip" style="--x: 22%; --h: 18px; --d: 0.2s;"></span>
+                            <span class="drip" style="--x: 38%; --h: 10px; --d: 0.4s;"></span>
+                            <span class="drip" style="--x: 54%; --h: 20px; --d: 0.1s;"></span>
+                            <span class="drip" style="--x: 70%; --h: 14px; --d: 0.3s;"></span>
+                            <span class="drip" style="--x: 86%; --h: 16px; --d: 0.5s;"></span>
+                            </div>
+                            <div class="tier__sprinkles">
+                            <span style="--x: 15%; --y: 55%; --c: #ffd98a;"></span>
+                            <span style="--x: 32%; --y: 70%; --c: #ff8fb0;"></span>
+                            <span style="--x: 50%; --y: 45%; --c: #c8b0ff;"></span>
+                            <span style="--x: 68%; --y: 65%; --c: #a5d5ff;"></span>
+                            <span style="--x: 85%; --y: 50%; --c: #ffd98a;"></span>
+                            </div>
+                        </div>
+
+                        <div class="tier tier--middle">
+                            <div class="tier__body"><div class="tier__pearls"></div></div>
+                            <div class="tier__icing">
+                            <span class="drip" style="--x: 6%; --h: 16px; --d: 0.3s;"></span>
+                            <span class="drip" style="--x: 18%; --h: 22px; --d: 0.5s;"></span>
+                            <span class="drip" style="--x: 30%; --h: 14px; --d: 0.1s;"></span>
+                            <span class="drip" style="--x: 44%; --h: 24px; --d: 0.4s;"></span>
+                            <span class="drip" style="--x: 58%; --h: 18px; --d: 0.2s;"></span>
+                            <span class="drip" style="--x: 72%; --h: 26px; --d: 0.6s;"></span>
+                            <span class="drip" style="--x: 84%; --h: 16px; --d: 0s;"></span>
+                            <span class="drip" style="--x: 94%; --h: 20px; --d: 0.7s;"></span>
+                            </div>
+                            <div class="tier__sprinkles">
+                            <span style="--x: 12%; --y: 60%; --c: #ff8fb0;"></span>
+                            <span style="--x: 24%; --y: 45%; --c: #a5d5ff;"></span>
+                            <span style="--x: 38%; --y: 68%; --c: #ffd98a;"></span>
+                            <span style="--x: 52%; --y: 50%; --c: #c8b0ff;"></span>
+                            <span style="--x: 66%; --y: 72%; --c: #ff8fb0;"></span>
+                            <span style="--x: 80%; --y: 55%; --c: #ffd98a;"></span>
+                            <span style="--x: 92%; --y: 65%; --c: #a5d5ff;"></span>
+                            </div>
+                        </div>
+
+                        <div class="tier tier--bottom">
+                            <div class="tier__body"><div class="tier__pearls"></div></div>
+                            <div class="tier__icing">
+                            <span class="drip" style="--x: 5%; --h: 18px; --d: 0.4s;"></span>
+                            <span class="drip" style="--x: 15%; --h: 24px; --d: 0.1s;"></span>
+                            <span class="drip" style="--x: 26%; --h: 16px; --d: 0.6s;"></span>
+                            <span class="drip" style="--x: 37%; --h: 26px; --d: 0.2s;"></span>
+                            <span class="drip" style="--x: 48%; --h: 20px; --d: 0.5s;"></span>
+                            <span class="drip" style="--x: 60%; --h: 28px; --d: 0s;"></span>
+                            <span class="drip" style="--x: 71%; --h: 22px; --d: 0.3s;"></span>
+                            <span class="drip" style="--x: 82%; --h: 18px; --d: 0.7s;"></span>
+                            <span class="drip" style="--x: 93%; --h: 24px; --d: 0.4s;"></span>
+                            </div>
+                            <div class="tier__sprinkles">
+                            <span style="--x: 8%; --y: 65%; --c: #ffd98a;"></span>
+                            <span style="--x: 20%; --y: 48%; --c: #ff8fb0;"></span>
+                            <span style="--x: 32%; --y: 72%; --c: #a5d5ff;"></span>
+                            <span style="--x: 44%; --y: 55%; --c: #c8b0ff;"></span>
+                            <span style="--x: 56%; --y: 68%; --c: #ffd98a;"></span>
+                            <span style="--x: 68%; --y: 50%; --c: #ff8fb0;"></span>
+                            <span style="--x: 80%; --y: 70%; --c: #a5d5ff;"></span>
+                            <span style="--x: 92%; --y: 58%; --c: #c8b0ff;"></span>
+                            </div>
+                        </div>
+
+                        <div class="cake__top-surface">
+                            <div class="cake__berries">
+                                <span class="berry" style="--x: 35%;"></span>
+                                <span class="berry" style="--x: 65%;"></span>
+                            </div>
+                        </div>
+
+                        <div class="cake__plate"></div>
+                        <div class="cake__plate-shadow" aria-hidden="true"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="candle-counter" id="candleCounter">
+                <span class="candle-counter__dot"></span>
+                <span><strong id="candlesRemaining">3</strong> mum kaldı</span>
+            </div>
+        </div>
+    </section>
+
+    <!-- ═══════════════ SAHNE 04 · MEKTUP ═══════════════ -->
+    <section id="scene04" class="scene scene--scroll" data-scene="4">
+        <div class="scene-inner">
+            <article class="letter">
+                <header class="letter__head">
+                    <div class="letter__stamp">
+                        <svg viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="1.2">
+                            <circle cx="20" cy="20" r="18"/>
+                            <path d="M20 8v24M8 20h24" stroke-dasharray="2 3"/>
+                        </svg>
+                    </div>
+                    <div class="letter__head-text">
+                        <span class="chapter-tag-simple">Bölüm 03 · Mektup</span>
+                        <h2 class="scene-title">Sana bir şey <em>yazdım</em></h2>
+                    </div>
+                </header>
+
+                <!-- ✏️ MEKTUP: data-text içindeki yazıları kendi sözlerinle değiştir (satır ekleyip silebilirsin) -->
+                <div class="letter__body">
+                    <p class="type-line" data-text="Şeyma seni tanıdığım günden beri herşey bir tık daha iyi gibi."></p>
+                    <p class="type-line" data-text="Selam öncelikle itiraf edeyim bu yaptığım şeyi 17 Ekim saat 00:00'da atarak seni daha çok mutlu etmek isterdim fakat insanların planlarından çok Allah'ın bizler için planladığı şeyleri yaşıyoruz. Bir gün birileri doğuyor birileri geldiği yere gidiyor. Neyse er yada geç bunu sana vermek istiyorum umarım beğenirsin. İçimde sana karşı sakladığım herşeyi aslında doğum gününde söyledim geç kalınan bir otobüse binilmiyor ama belki tren garda bekler diye yine bunu yaptım hatta kayseri'ye gelir gelmez hemen başına oturdum oturdum ki daha da gecikmeyeyim. Bunları sana anlatarak sıkılmanı istemem asıl isteyeceğim şey mutlu olman her zamanki gibi gülmen evet dediğim gibi bizim için Allah'ın planı farklı oluyor fakat olabildiğince sabır etmek dayanmak inadına gülümsemektir belki hayat yada bunların farkına varabilmek için doğum günü kutlamaları, yılbaşı, bayramlar, doğumlar ve ölümler vardır. Sen benim için özel olduğunu unutma sadece bende değil ablan kardeşin annen baban ve daha nicesi senin iyi olman mutlu olman için gözünü yumarak fedakarlık edecek bir çok insan var bunların arasında bende varım djfsdjkfsdkjfj. İnşallah hep gülersin, eğlenir, kahkahalar içinde karnın ağrır. Yok karnın ağrımasın ama gül hep çünkü gülünce daha güzel oluyorsun. Bu yeni yaşında, 22'nde, sana kocaman dileklerim var. Sağlığın hep yerinde olsun, güldüğün yerden hiç eksilmesin. Yorulduğun günlerde yanında seni anlayan, omzunu uzatan insanlar olsun. Hayallerin sadece hayal olarak kalmasın; tek tek gerçeğe dönüşsün. Kapıyı açtığında karşına hep güzel haberler, güzel insanlar ve güzel fırsatlar çıksın. Çok gülesin, çok gezesin, çok sevesin ve çok sevilesin. Zor zamanlar olursa onları da kolayca atlatacak gücün ve huzurun hep seninle olsun. Her yeni yaşın bir öncekinden daha güzel, daha huzurlu ve daha mutlu geçsin."></p>
+                    <p class="type-line" data-text="Geç kaldım ama içtenliğimde hiç geç kalmadım: İyi ki doğdun, iyi ki hayatımdasın. Hazır olunca aç ve bak, umarım beğenirsin."></p>
+                    <p class="type-line" data-text="İyi ki varsın. İyi ki doğdun."></p>
+                </div>
+
+                <footer class="letter__sign">
+                    <span class="sign-line">Seni çok seviyorum(arkadaşça fhdjfh)</span>
+                    <svg class="sign-heart" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M12 21s-8-5-8-11a4 4 0 0 1 7-2.6L12 8l1-0.6A4 4 0 0 1 20 10c0 6-8 11-8 11z"/>
+                    </svg>
+                </footer>
+            </article>
+
+            <button class="btn btn--primary btn--reveal" data-next="5" data-magnetic id="letterNextBtn"><span>Şimdi sıra sende</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 5l7 7-7 7"/></svg></button>
+        </div>
+    </section>
+
+    <!-- ═══════════════ SAHNE 05 · CEVAP ═══════════════ -->
+    <section id="scene05" class="scene" data-scene="5">
+        <div class="scene-inner">
+            <div class="compose">
+                <header class="compose__head">
+                    <span class="chapter-tag-simple">Bölüm 04 · Cevap</span>
+                    <h2 class="scene-title">Şimdi sıra <em>sende</em></h2>
+                    <p class="compose__sub">Aklından ne geçiyorsa yaz. Gerçekten merak ediyorum.</p>
+                </header>
+
+                <!-- ✏️ FORM: SENIN_FORMSPREE_KODUN yerine formspree.io'dan aldığın kodu yaz -->
+                <form action="https://formspree.io/f/xyekpnpd" method="POST" id="responseForm" class="compose__form">
+                    <div class="field">
+                        <textarea name="message" placeholder=" " required rows="6"></textarea>
+                        <label class="field__label">Düşüncelerin</label>
+                    </div>
+
+                    <button type="submit" class="btn btn--primary btn--submit" data-magnetic>
+                        <span class="btn__text">Gönder</span>
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12l16-8-6 8 6 8z"/></svg>
+                    </button>
+                </form>
+
+                <div id="formSuccess" class="sent hidden">
+                    <div class="sent__badge">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12.5l5 5L20 6"/></svg>
+                    </div>
+                    <h3 class="sent__title">Mesajın ulaştı</h3>
+                    <p class="sent__sub">En kısa zamanda okuyacağım</p>
+                    <button class="btn btn--ghost" data-next="6" style="margin-top: 20px;"><span>Son bir şey daha var</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 5l7 7-7 7"/></svg></button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ═══════════════ SAHNE 06 · KUTLAMA ═══════════════ -->
+    <section id="scene06" class="scene" data-scene="6">
+        <div class="scene-inner">
+            <div class="chapter-tag">
+                <span>Bölüm 05</span>
+                <span class="chapter-line"></span>
+                <span>Kutlama</span>
+            </div>
+
+            <h2 class="scene-title scene-title--xl">
+                İyi ki<br>
+                <em>doğdun</em>
+            </h2>
+
+            <p class="scene-sub">
+                Bu hikaye senin için yazıldı.<br>
+                Ve her yıl daha da güzel olacak.
+            </p>
+
+            <button class="btn btn--primary btn--large" id="celebrateBtn">
+                <span>Kutlamayı başlat</span>
+                <span>🎉</span>
+            </button>
+        </div>
+    </section>
+
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js" defer></script>
+    <script src="script.js" defer></script>
+</body>
+</html>
